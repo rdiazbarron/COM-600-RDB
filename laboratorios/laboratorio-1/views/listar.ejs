@@ -1,0 +1,31 @@
+<% include('layout', { body: null }) %>
+<h2>Lista de Contactos</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th> 
+      <th>Nombres</th>
+      <th>Apellidos</th>
+      <th>Telefono</th>
+      <th>Direccion</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% contactos.forEach(contacto => { %>
+      <tr>
+        <td><%= contacto.id %></td> 
+        <td><%= contacto.nombres %></td>
+        <td><%= contacto.apellidos %></td>
+        <td><%= contacto.telefono %></td>
+        <td><%= contacto.direccion %></td>
+        <td>
+          <a href="/edit/<%= contacto.id %>">Editar</a>
+          <a href="/delete/<%= contacto.id %>" onclick="return confirm('¿Estás seguro de eliminar este contacto?')">Eliminar</a>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<a href="/add">Registrar contacto</a>
