@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mongo:latest  
+    container_name: mongo_db
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: bd_tareas  
+      MONGO_INITDB_ROOT_USERNAME: root  
+      MONGO_INITDB_ROOT_PASSWORD: root  
+    ports:
+      - "27017:27017"  
+    volumes:
+      - mongo_data:/data/db  
+
+  app:
+    build: .
+    ports:
+      - "3005:3005"
+    depends_on:
+      - db
+    environment:
+      PORT: 3005
+      DB_URI: "mongodb://root:root@db:27017/bd_tareas?authSource=admin"  
+    volumes:
+      - .:/app
+
+volumes:
+  mongo_data:

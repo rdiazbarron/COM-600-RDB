@@ -1,0 +1,29 @@
+<% include('layout', { body: null }) %>
+<h2>Lista de usuarios</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th> 
+      <th>Nombre</th>
+      <th>correo electronico</th>
+      <th>fecha registro</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% usuarios.forEach(u => { %>
+      <tr>
+        <td><%= u.id %></td> 
+        <td><%= u.nombre %></td>
+        <td><%= u.correo_electronico %></td>
+        <td><%= u.fecha_registro %></td>
+        <td>
+          <a href="/edit/<%= u.id %>">Editar</a>
+          <a href="/delete/<%= u.id %>" onclick="return confirm('¿Estás seguro de eliminar este usuario?')">Eliminar</a>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<a href="/add">Registrar u</a>
