@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./database');
+const getDb = require('./database');
+const db = getDb();
 
 const app = express();
 const port = process.env.PORT
@@ -77,6 +78,6 @@ app.get('/delete/:id', (req, res) => {
 
 // Iniciar servidor
 app.listen( port, () => {
-    console.log('Servidor corriendo en http://localhost:3005');
+    //console.log('Servidor corriendo en http://localhost:3005');
   });
   

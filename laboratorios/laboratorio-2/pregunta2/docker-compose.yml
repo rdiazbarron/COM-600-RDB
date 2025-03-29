@@ -27,3 +27,4 @@ services:
 
 volumes:
   mysql_data:
+#tuve que crear la base de datos en el shell
