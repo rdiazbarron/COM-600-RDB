@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS bd_tareas;
+USE bd_tareas;
+
+CREATE TABLE IF NOT EXISTS tareas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    fecha DATE NOT NULL,
+    estado VARCHAR(255) NULL
+);

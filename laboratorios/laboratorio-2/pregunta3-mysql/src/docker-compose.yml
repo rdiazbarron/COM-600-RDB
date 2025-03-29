@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mysql:8.0
+    #container_name: mongo_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: bd_tareas
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"  
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    build: .
+    ports:
+      - "3005:3005"
+    depends_on:
+      - db
+    environment:
+      PORT: 3005
+      DB_HOST: db
+      DB_NAME: bd_tareas
+      DB_USER: root
+      DB_PASS: root
+
+volumes:
+  mysql_data:
