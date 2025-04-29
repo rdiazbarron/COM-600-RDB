@@ -1,0 +1,34 @@
+type Libro {
+  id: ID!
+  titulo: String!
+  autor: String!
+  editorial: String!
+  descripcion: String!
+  anio: Int!
+  nro_paginas: Int!
+  created_at: String
+  updated_at: String
+}
+
+type Query {
+  libros: [Libro!]! @all
+  libro(id: ID!): Libro @field(resolver: "App\\GraphQL\\Queries\\LibroPorId")
+}
+
+input LibroInput {
+  titulo: String!
+  autor: String!
+  editorial: String!
+  descripcion: String!
+  anio: Int!
+  nro_paginas: Int!
+}
+
+type Mutation {
+  crearLibro(input: LibroInput!): Libro @field(resolver: "App\\GraphQL\\Mutations\\CrearLibro")
+
+  updateLibro(id: ID!, input: LibroInput!): Libro @field(resolver: "App\\GraphQL\\Mutations\\UpdateLibro")
+
+  deleteLibro(id: ID!): Libro @field(resolver: "App\\GraphQL\\Mutations\\DeleteLibro")
+
+}
