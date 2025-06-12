@@ -1,40 +1,48 @@
 # Usa la imagen oficial de PHP con Apache
 FROM php:8.2-apache
 
-# Instala dependencias de Laravel y PHP
+# Instala dependencias necesarias para el servicio de correos
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
-    && docker-php-ext-install mbstring exif pcntl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install mbstring \
+    && docker-php-ext-install exif \
+    && docker-php-ext-install pcntl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia el código de Laravel al contenedor
+# Configuración de Apache
+RUN a2enmod rewrite
+
+# Copia el código del proyecto
 WORKDIR /var/www/html
 COPY . .
 
-# Instala dependencias de Composer (producción)
-RUN composer install --no-dev --no-scripts --no-autoloader --optimize-autoloader
+# Instala las dependencias
+RUN composer install --no-dev --optimize-autoloader
 
-# Genera el autoloader optimizado
-RUN composer dump-autoload --optimize
+# Configuración de permisos
+RUN chown -R www-data:www-data /var/www/html/storage
+RUN chmod -R 775 /var/www/html/storage
 
-# Configura Laravel
-RUN cp .env.example .env && \
-    php artisan key:generate && \
-    chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Configuración de la aplicación
+COPY .env.example .env
+RUN php artisan key:generate
 
-# Configura Apache
-COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
-RUN a2enmod rewrite
-
-# Puerto expuesto
+# Expone el puerto 80
 EXPOSE 80
+
+# Comando por defecto
+CMD ["apache2-foreground"]

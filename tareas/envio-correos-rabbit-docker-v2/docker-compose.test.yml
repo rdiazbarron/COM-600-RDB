@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Interfaz de gestión
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: /
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping && rabbitmqctl list_queues name messages
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  notifications:
+    image: ricard010/servicio-notificaciones:2.3  # Usa la nueva versión
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      # RabbitMQ
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_QUEUE: notifications_queue
+      
+      # SMTP (Gmail)
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: diazbarronricardojairo2@gmail.com
+      MAIL_PASSWORD: hzbsbtwnuwixnypt
+      MAIL_ENCRYPTION: tls
+      MAIL_FROM_ADDRESS: diazbarronricardojairo2@gmail.com
+      MAIL_FROM_NAME: "Notificaciones Eventos"
+      
+      # Laravel
+      APP_ENV: testing
+      LOG_CHANNEL: stderr
+      APP_DEBUG: "true"  # Solo para entorno de pruebas
+    restart: unless-stopped
+    volumes:
+      - ./storage/logs:/var/www/storage/logs
+      - ./storage/framework:/var/www/storage/framework
+    healthcheck:
+      test: ["CMD-SHELL", "php -r 'fsockopen(\"$$RABBITMQ_HOST\", $$RABBITMQ_PORT) or exit(1);' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  rabbitmq_data:
